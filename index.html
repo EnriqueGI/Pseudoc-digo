@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducción al Pseudocódigo - Programación I</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            border: 1px solid #4a5568;
+        }
+        .code-keyword { color: #63b3ed; }
+        .code-string { color: #a3bf95; }
+        .code-comment { color: #90cdf4; }
+        .code-variable { color: #faf089; }
+        .feedback-correct { color: #48bb78; font-weight: bold; }
+        .feedback-incorrect { color: #f56565; font-weight: bold; }
+        
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: #6366f1;
+            color: #111827;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Variable Box Analogy */
+        .variable-box-container {
+            background-color: #f3f4f6;
+            border: 2px dashed #9ca3af;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .variable-box {
+            background: linear-gradient(145deg, #ffffff, #e6e9ee);
+            border: 1px solid #d1d5db;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: inline-block;
+            min-width: 200px;
+            position: relative;
+        }
+        .variable-box-label {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .variable-box-content {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Flowchart Styles */
+        .flowchart { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.875rem; }
+        .flow-node { border: 2px solid #4f46e5; padding: 0.75rem 1.5rem; border-radius: 0.375rem; background-color: white; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .flow-decision { transform: rotate(45deg); width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; margin: 30px 0;}
+        .flow-decision span { transform: rotate(-45deg); }
+        .flow-arrow { width: 2px; background-color: #6b7280; position: relative; }
+        .flow-arrow::after { content: ''; position: absolute; left: -5px; bottom: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #6b7280; }
+        .flow-line { position: relative; overflow: hidden; }
+        .flow-animation::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, #6366f1, transparent);
+            animation: flow-down 2.5s linear infinite;
+        }
+        @keyframes flow-down { from { top: -100%; } to { top: 100%; } }
+        
+        .video-placeholder {
+            background-color: #000;
+            border-radius: 0.5rem;
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        .video-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .video-placeholder:hover img {
+            transform: scale(1.05);
+        }
+        .play-button {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-gray-900">Aprendiendo Pseudocódigo</h1>
+            <p class="text-md text-gray-600">Prof. Enrique González (Programación I CeRP Centro)</p>
+        </div>
+        <!-- Tab Navigation -->
+        <div class="container mx-auto px-6 border-b border-gray-200">
+            <nav class="flex space-x-8 -mb-px overflow-x-auto">
+                <button onclick="changeTab('definicion')" class="tab-btn active text-gray-600 hover:text-gray-800 py-4 px-1 text-lg font-medium flex-shrink-0">Definición</button>
+                <button onclick="changeTab('variables')" class="tab-btn text-gray-600 hover:text-gray-800 py-4 px-1 text-lg font-medium flex-shrink-0">Variables</button>
+                <button onclick="changeTab('operadores')" class="tab-btn text-gray-600 hover:text-gray-800 py-4 px-1 text-lg font-medium flex-shrink-0">Operadores</button>
+                <button onclick="changeTab('estructuras')" class="tab-btn text-gray-600 hover:text-gray-800 py-4 px-1 text-lg font-medium flex-shrink-0">Estructuras</button>
+                <button onclick="changeTab('ejercicios')" class="tab-btn text-gray-600 hover:text-gray-800 py-4 px-1 text-lg font-medium flex-shrink-0">Ejercicios Generales</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <!-- Tab Content: Definición -->
+        <div id="definicion" class="tab-content active">
+             <section class="bg-white p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b-2 border-indigo-500 pb-2">¿Qué es el Pseudocódigo?</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4">Piensa en el pseudocódigo como una <strong class="text-indigo-600">receta de cocina para una computadora</strong>. Antes de escribir las instrucciones en un idioma que solo un chef experto (un lenguaje de programación) entendería, escribes los pasos de forma clara y sencilla, para que cualquiera pueda seguir la lógica.</p>
+                        <p class="mb-4">No necesitas seguir reglas estrictas de un lenguaje, pero sí mantener una estructura lógica que te permita, más adelante, traducirlo fácilmente a código real.</p>
+                        <div class="code-block mt-6">
+                            <pre><code><span class="code-keyword">Algoritmo</span> SumaDosNumeros
+  <span class="code-comment">// 1. Pedir los ingredientes (números)</span>
+  <span class="code-keyword">Escribir</span> <span class="code-string">"Dame el primer número"</span>
+  <span class="code-keyword">Leer</span> <span class="code-variable">num1</span>
+  <span class="code-keyword">Escribir</span> <span class="code-string">"Dame el segundo número"</span>
+  <span class="code-keyword">Leer</span> <span class="code-variable">num2</span>
+  
+  <span class="code-comment">// 2. Realizar la preparación (cálculo)</span>
+  <span class="code-variable">suma</span> &lt;- <span class="code-variable">num1</span> + <span class="code-variable">num2</span>
+  
+  <span class="code-comment">// 3. Servir el plato (mostrar resultado)</span>
+  <span class="code-keyword">Escribir</span> <span class="code-string">"El resultado es: "</span>, <span class="code-variable">suma</span>
+<span class="code-keyword">FinAlgoritmo</span></code></pre>
+                        </div>
+                    </div>
+                    <div class="flex flex-col justify-center">
+                         <h3 class="text-lg font-semibold mb-2">Video Explicativo</h3>
+                         <div class="video-placeholder">
+                            <img src="https://placehold.co/1280x720/6366f1/ffffff?text=Video+sobre+Algoritmos" alt="Video sobre Algoritmos">
+                            <div class="play-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                            </div>
+                         </div>
+                         <p class="text-sm text-gray-500 mt-2 text-center">Una introducción visual a los algoritmos y el pseudocódigo.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab Content: Variables -->
+        <div id="variables" class="tab-content">
+            <section class="mb-8 bg-white p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b-2 border-indigo-500 pb-2">Variables: Las Cajas de Memoria</h2>
+                 <p class="mb-6">Una variable es como una <strong class="text-indigo-600">caja con una etiqueta</strong>. Dentro de la caja, guardas un dato (un número, una palabra, etc.). La etiqueta es el nombre de la variable, que te permite encontrar y usar el dato guardado cuando lo necesites.</p>
+                 <div class="variable-box-container mb-6">
+                    <p class="mb-4">Al declarar <code>Definir edad Como Entero</code> y luego asignar <code>edad &lt;- 25</code>, estás haciendo esto:</p>
+                    <div class="variable-box">
+                        <div class="variable-box-label">edad (Entero)</div>
+                        <div class="variable-box-content">25</div>
+                    </div>
+                 </div>
+                 <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="code-block">
+                        <pre><code><span class="code-comment">// Creamos las "cajas" y definimos qué guardarán</span>
+<span class="code-keyword">Definir</span> <span class="code-variable">edad</span> <span class="code-keyword">Como Entero</span>
+<span class="code-keyword">Definir</span> <span class="code-variable">nombre</span> <span class="code-keyword">Como Cadena</span>
+
+<span class="code-comment">// Guardamos datos en las cajas</span>
+<span class="code-variable">edad</span> &lt;- 25
+<span class="code-variable">nombre</span> &lt;- <span class="code-string">"Ana"</span></code></pre>
+                    </div>
+                     <div>
+                         <h3 class="text-lg font-semibold mb-2">Video: ¿Qué son las Variables?</h3>
+                         <div class="video-placeholder">
+                            <img src="https://placehold.co/1280x720/4f46e5/ffffff?text=Video+sobre+Variables" alt="Video sobre Variables">
+                             <div class="play-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                            </div>
+                         </div>
+                    </div>
+                 </div>
+            </section>
+            <section class="bg-white p-8 rounded-lg shadow-lg">
+                <h3 class="text-xl font-bold mb-4">Ejercicios de Variables</h3>
+                <div class="space-y-6">
+                    <div>
+                        <p class="font-semibold mb-2">1. ¿Cuál de los siguientes nombres de variable es INVÁLIDO?</p>
+                        <label class="block"><input type="radio" name="var_q1" value="a"> _cantidad</label>
+                        <label class="block"><input type="radio" name="var_q1" value="b"> cantidad_productos</label>
+                        <label class="block"><input type="radio" name="var_q1" value="c"> 2doLugar</label>
+                    </div>
+                    <div>
+                        <p class="font-semibold mb-2">2. Completa la instrucción para guardar un precio con decimales:</p>
+                        <p><code>Definir precio_producto Como </code><input type="text" id="var_q2" class="border rounded px-2 py-1 w-24"></p>
+                    </div>
+                </div>
+                <button onclick="checkAnswers('variables')" class="mt-6 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">Verificar</button>
+                <div id="feedback-variables" class="mt-4 space-y-2"></div>
+            </section>
+        </div>
+
+        <!-- Tab Content: Operadores -->
+        <div id="operadores" class="tab-content">
+            <section class="mb-8 bg-white p-8 rounded-lg shadow-lg">
+                 <h2 class="text-2xl font-bold mb-4 border-b-2 border-indigo-500 pb-2">Operadores: Las Herramientas de Cálculo y Comparación</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <p class="mb-4">Los operadores son los símbolos que le dicen a la computadora qué hacer con tus variables. Son como las herramientas en una caja: tienes <strong class="text-indigo-600">sumadores y restadores</strong> (aritméticos), <strong class="text-indigo-600">lupas para comparar</strong> si algo es más grande o igual (relacionales) y <strong class="text-indigo-600">conectores lógicos</strong> para tomar decisiones complejas (lógicos).</p>
+                        <div class="overflow-x-auto mt-6">
+                            <table class="min-w-full bg-white border">
+                                <thead class="bg-indigo-500 text-white"><tr><th class="py-2 px-4">Tipo</th><th class="py-2 px-4">Operador</th><th class="py-2 px-4">Ejemplo</th></tr></thead>
+                                <tbody>
+                                    <tr class="bg-gray-100"><td class="py-2 px-4 font-bold" colspan="3">Aritméticos</td></tr>
+                                    <tr><td class="py-2 px-4">Suma</td><td class="py-2 px-4 font-mono">+</td><td class="py-2 px-4 font-mono">5 + 3</td></tr>
+                                    <tr class="bg-gray-100"><td class="py-2 px-4 font-bold" colspan="3">Relacionales</td></tr>
+                                    <tr><td class="py-2 px-4">Igual a</td><td class="py-2 px-4 font-mono">==</td><td class="py-2 px-4 font-mono">4 == 4</td></tr>
+                                    <tr class="bg-gray-100"><td class="py-2 px-4 font-bold" colspan="3">Lógicos</td></tr>
+                                    <tr><td class="py-2 px-4">Y (AND)</td><td class="py-2 px-4 font-mono">Y</td><td class="py-2 px-4 font-mono">(4>2) Y (5&lt;10)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                         <h3 class="text-lg font-semibold mb-2">Video: Tipos de Operadores</h3>
+                         <div class="video-placeholder">
+                            <img src="https://placehold.co/1280x720/4338ca/ffffff?text=Video+sobre+Operadores" alt="Video sobre Operadores">
+                             <div class="play-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </section>
+             <section class="bg-white p-8 rounded-lg shadow-lg">
+                <h3 class="text-xl font-bold mb-4">Ejercicios de Operadores</h3>
+                <div class="space-y-6">
+                    <div>
+                        <p class="font-semibold mb-2">1. ¿Cuál es el resultado de la operación `(5 > 3) Y (10 == 10)`?</p>
+                        <label class="block"><input type="radio" name="op_q1" value="a"> Verdadero</label>
+                        <label class="block"><input type="radio" name="op_q1" value="b"> Falso</label>
+                    </div>
+                     <div>
+                        <p class="font-semibold mb-2">2. Completa el espacio: El resultado de `10 / 2 + 3` es:</p>
+                        <input type="text" id="op_q2" class="border rounded px-2 py-1 w-24">
+                    </div>
+                </div>
+                <button onclick="checkAnswers('operadores')" class="mt-6 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">Verificar</button>
+                <div id="feedback-operadores" class="mt-4 space-y-2"></div>
+            </section>
+        </div>
+        
+        <!-- Tab Content: Estructuras -->
+        <div id="estructuras" class="tab-content">
+            <section class="mb-8 bg-white p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b-2 border-indigo-500 pb-2">Estructuras de Control: El GPS del Código</h2>
+                <p class="mb-6">Las estructuras de control son como un GPS para tu programa. Le indican <strong class="text-indigo-600">qué camino tomar</strong> según ciertas condiciones. Permiten que tu código no sea una simple lista de tareas, sino un sistema inteligente que puede tomar decisiones y repetir acciones.</p>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2 text-center">Condicional (Si-Entonces-Sino)</h3>
+                        <p class="text-center mb-4">Una bifurcación en el camino.</p>
+                        <div class="flowchart">
+                            <div class="flow-node">Inicio</div>
+                            <div class="flow-arrow flow-line flow-animation" style="height: 30px;"></div>
+                            <div class="flow-node flow-decision"><span>¿edad >= 18?</span></div>
+                            <div class="flex w-full justify-around">
+                                <div class="flex flex-col items-center">
+                                    <div class="flow-arrow flow-line flow-animation" style="height: 30px;"></div>
+                                    <div class="flow-node bg-green-100 border-green-500">Escribir "Mayor"</div>
+                                     <div class="text-sm font-bold text-green-600 mt-2">VERDADERO</div>
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <div class="flow-arrow flow-line flow-animation" style="height: 30px;"></div>
+                                    <div class="flow-node bg-red-100 border-red-500">Escribir "Menor"</div>
+                                    <div class="text-sm font-bold text-red-600 mt-2">FALSO</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div>
+                         <h3 class="text-xl font-semibold mb-2">Video: Estructuras de Control</h3>
+                         <div class="video-placeholder">
+                            <img src="https://placehold.co/1280x720/3730a3/ffffff?text=Video+sobre+Estructuras" alt="Video sobre Estructuras de Control">
+                             <div class="play-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-white" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </section>
+            <section class="bg-white p-8 rounded-lg shadow-lg">
+                <h3 class="text-xl font-bold mb-4">Ejercicios de Estructuras</h3>
+                <div class="space-y-6">
+                     <div>
+                        <p class="font-semibold mb-2">1. Si la variable `edad` es 17, ¿qué mostrará el diagrama de flujo?</p>
+                        <label class="block"><input type="radio" name="est_q1" value="a"> El camino VERDADERO ("Mayor")</label>
+                        <label class="block"><input type="radio" name="est_q1" value="b"> El camino FALSO ("Menor")</label>
+                    </div>
+                    <div>
+                        <p class="font-semibold mb-2">2. En la estructura `Segun`, la sección que se ejecuta si ninguna opción coincide es:</p>
+                        <input type="text" id="est_q2" class="border rounded px-2 py-1 w-48">
+                    </div>
+                </div>
+                <button onclick="checkAnswers('estructuras')" class="mt-6 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">Verificar</button>
+                <div id="feedback-estructuras" class="mt-4 space-y-2"></div>
+            </section>
+        </div>
+        
+        <!-- Tab Content: Ejercicios Generales -->
+        <div id="ejercicios" class="tab-content">
+             <section class="bg-white p-8 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-6 border-b-2 border-indigo-500 pb-2">Ejercicios Generales</h2>
+                <div class="space-y-8">
+                    <div>
+                        <p class="font-semibold mb-2">1. La palabra clave para leer un valor del teclado es:</p>
+                        <label class="block"><input type="radio" name="gen_q1" value="a"> Escribir</label>
+                        <label class="block"><input type="radio" name="gen_q1" value="b"> Leer</label>
+                        <label class="block"><input type="radio" name="gen_q1" value="c"> Definir</label>
+                    </div>
+                    <div>
+                        <p class="font-semibold mb-2">2. Completa el código para que la condición sea verdadera si `nota` es mayor o igual a 6.</p>
+                        <p><code>Si nota <input type="text" id="gen_q2" class="border rounded px-2 py-1 w-16"> 6 Entonces</code></p>
+                    </div>
+                    <div>
+                        <p class="font-semibold mb-2">3. El tipo de dato para almacenar el texto "Hola Mundo" es `Logico`.</p>
+                        <label class="block"><input type="radio" name="gen_q3" value="a"> Verdadero</label>
+                        <label class="block"><input type="radio" name="gen_q3" value="b"> Falso</label>
+                    </div>
+                </div>
+                <button onclick="checkAnswers('generales')" class="mt-8 bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700">Verificar Respuestas</button>
+                <div id="feedback-generales" class="mt-6 space-y-2"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        function changeTab(tabId) {
+            contents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('onclick').includes(tabId)) {
+                    tab.classList.add('active');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function checkAnswers(section) {
+            const feedbackEl = document.getElementById(`feedback-${section}`);
+            feedbackEl.innerHTML = '';
+            
+            if (section === 'variables') {
+                const q1 = document.querySelector('input[name="var_q1"]:checked');
+                const q2 = document.getElementById('var_q2').value.trim();
+                feedbackEl.innerHTML += `<p>1. ${q1 && q1.value === 'c' ? '<span class="feedback-correct">Correcto.</span> Los nombres de variables no pueden empezar con números.' : '<span class="feedback-incorrect">Incorrecto.</span> La respuesta correcta es "2doLugar".'}</p>`;
+                feedbackEl.innerHTML += `<p>2. ${q2.toLowerCase() === 'real' ? '<span class="feedback-correct">Correcto.</span>' : '<span class="feedback-incorrect">Incorrecto.</span> El tipo de dato para decimales es Real.'}</p>`;
+            } else if (section === 'operadores') {
+                const q1 = document.querySelector('input[name="op_q1"]:checked');
+                const q2 = document.getElementById('op_q2').value.trim();
+                feedbackEl.innerHTML += `<p>1. ${q1 && q1.value === 'a' ? '<span class="feedback-correct">Correcto.</span> Ambas condiciones son verdaderas.' : '<span class="feedback-incorrect">Incorrecto.</span>'}</p>`;
+                feedbackEl.innerHTML += `<p>2. ${q2 === '8' ? '<span class="feedback-correct">Correcto.</span>' : '<span class="feedback-incorrect">Incorrecto.</span> La división se hace primero (10/2=5), luego la suma (5+3=8).'}</p>`;
+            } else if (section === 'estructuras') {
+                const q1 = document.querySelector('input[name="est_q1"]:checked');
+                const q2 = document.getElementById('est_q2').value.trim();
+                feedbackEl.innerHTML += `<p>1. ${q1 && q1.value === 'b' ? '<span class="feedback-correct">Correcto.</span>' : '<span class="feedback-incorrect">Incorrecto.</span> 17 no es mayor o igual a 18, por lo que se ejecuta el Sino (camino Falso).'}</p>`;
+                feedbackEl.innerHTML += `<p>2. ${q2.toLowerCase().replace(/\s/g, '') === 'deotromodo' ? '<span class="feedback-correct">Correcto.</span>' : '<span class="feedback-incorrect">Incorrecto.</span> Se usa "De Otro Modo".'}</p>`;
+            } else if (section === 'generales') {
+                const q1 = document.querySelector('input[name="gen_q1"]:checked');
+                const q2 = document.getElementById('gen_q2').value.trim();
+                const q3 = document.querySelector('input[name="gen_q3"]:checked');
+                feedbackEl.innerHTML += `<p>1. ${q1 && q1.value === 'b' ? '<span class="feedback-correct">Correcto.</span>' : '<span class="feedback-incorrect">Incorrecto.</span> Se usa "Leer".'}</p>`;
+                feedbackEl.innerHTML += `<p>2. ${q2 === '>=' ? '<span class="feedback-correct">Correcto.</span>' : '<span class="feedback-incorrect">Incorrecto.</span> El operador para "mayor o igual" es >=.'}</p>`;
+                feedbackEl.innerHTML += `<p>3. ${q3 && q3.value === 'b' ? '<span class="feedback-correct">Correcto.</span> Es Falso, el tipo correcto es "Cadena".' : '<span class="feedback-incorrect">Incorrecto.</span>'}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
